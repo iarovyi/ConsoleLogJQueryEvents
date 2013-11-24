@@ -26,7 +26,7 @@
         return "{0} {1} {2} {3}".replace("{0}", element ? element.tagName : "")
                                 .replace("{1}", id ? "#" + id : "")
                                 .replace("{2}", cssClass ? "." + cssClass : "")
-                                .replace("{3}", element ? (element[jQueryElementIdPropertyName] || "") : "")
+                                .replace("{3}", element ? (element[jQueryElementIdPropertyName] || "") : "");
     };
 
     function getElementCaption($element) {
