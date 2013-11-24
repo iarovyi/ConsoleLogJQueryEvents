@@ -3,6 +3,12 @@
         cache = $.cache || {},
         jQueryElementIdPropertyName = $.expando;
 
+    function ensureObjectHasMethods(object, methods){
+        $.each(methods, function(i, methodName){
+            object[methodName] = typeof(object[methodName]) === "function" ? object[methodName] : $.noop;
+        });
+    };
+
     function groupAutoCollapsed(caption, writeToLogFunction) {
         try {
             console.groupCollapsed(caption);
@@ -13,13 +19,14 @@
     };
 
     function generateElementCaption($element) {
-        var id = $element.attr('id'),
+        var element = $element.get(0),
+            id = $element.attr('id'),
             cssClass = $element.attr('class');
 
-        return "{0} {1} {2} {3}".replace("{0}", $element.get(0).tagName)
+        return "{0} {1} {2} {3}".replace("{0}", element ? element.tagName : "")
                                 .replace("{1}", id ? "#" + id : "")
                                 .replace("{2}", cssClass ? "." + cssClass : "")
-                                .replace("{3}", $element.get(0)[jQueryElementIdPropertyName] || "")
+                                .replace("{3}", element ? (element[jQueryElementIdPropertyName] || "") : "")
     };
 
     function getElementCaption($element) {
@@ -52,15 +59,17 @@
     console.logEvents = function(elements) {
         var $elements = $(elements);
 
-        if ($elements.size() < 2) {
-            logElementEvents($elements);
-        } else {
-            groupAutoCollapsed(getElementCaption($elements), function(){
-                $.each($elements, function(){
-                    logElementEvents(this);
-                });
-            });
+        if ($elements.size() === 1) {
+            return logElementEvents($elements);
         }
+
+        groupAutoCollapsed(getElementCaption($elements), function(){
+            $.each($elements, function(){
+                logElementEvents(this);
+            });
+        });
     };
+
+    ensureObjectHasMethods(console, ["log", "groupCollapsed", "groupEnd"]);
 
 })(jQuery)
